@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幻境HaloDream</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-black">
+    <!-- 3D粒子容器 -->
+    <div id="particle-container"></div>
+    <!-- 页面主要内容容器，确保内容在特效之上 -->
+    <div class="relative z-10 min-h-screen flex flex-col px-4 md:px-8 pl-12 md:pl-24 pointer-events-none">
+        <!-- 顶端导航栏 -->
+        <header class="py-6 pointer-events-auto">
+            <nav class="w-full flex justify-between items-center">
+                <!-- 公司名称 -->
+                <div class="text-3xl font-bold text-white text-glow">幻境HaloDream</div>
+                <!-- 导航链接 -->
+                <div class="hidden md:flex items-center space-x-12 text-xl">
+                    <a href="#features" class="text-gray-300 nav-link">特色</a>
+                    <a href="#functions" class="text-gray-300 nav-link">功能</a>
+                </div>
+                <!-- 注册登录按钮 -->
+                <a href="#login" class="border-2 border-pink-400 text-pink-300 rounded-full px-6 py-2 text-lg font-semibold button-glow whitespace-nowrap" style="font-size:clamp(0.9rem,4vw,1.125rem);">
+                    注册/登录
+                </a>
+            </nav>
+        </header>
+        <!-- 主要内容区域 -->
+        <main class="flex-grow w-full flex items-center">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center w-full">
+                <!-- 左侧文本内容 -->
+                <div class="text-left pointer-events-auto">
+                    <h1 class="text-5xl md:text-5xl font-bold text-white leading-tight text-glow gradient-text whitespace-nowrap" style="font-size:clamp(1.2rem,8vw,3rem);">
+                        打造社交新范式！
+                    </h1>
+                    <p class="mt-6 text-lg md:text-xl text-gray-300 max-w-lg md:mx-0">
+                        我们致力于打造新一代软件定义的虚拟数字人。无需昂贵设备，即可轻松创造、定制并与拥有独特个性的AI智能体进行深度互动。
+                    </p>
+                    <a href="https://www.google.com" target="_blank" class="button-cta group mt-12 inline-flex items-center justify-center text-xl md:text-2xl font-bold tracking-widest text-pink-300 hover:text-white transition-all duration-300 button-glow rounded-lg px-2 py-1 hover:bg-pink-700/20 border-2 border-pink-400 bg-black/60 shadow-lg">
+                        <span class="button-cta-text">快速使用</span>
+                        <span class="button-cta-arrow">&gt;&gt;</span>
+                    </a>
+                </div>
+                <!-- 右侧空白区域，由3D粒子填充 -->
+                <div class="w-full h-96 md:h-full pointer-events-none">
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- 其它内容 -->
+    <script src="main.js" type="module"></script>
+</body>
+</html>
