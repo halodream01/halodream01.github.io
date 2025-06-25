@@ -1,87 +1,371 @@
-/* 自定义字体和发光效果 */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Noto+Sans+SC:wght@400;700&display=swap');
+/* --- Global Style Overhaul --- */
+:root {
+    --bg-dark-blue: #000000;
+    --text-primary: #EAEAEA;
+    --text-secondary: #a0aec0;
+    --accent-pink: #FFB7C5;
+    --accent-purple: #C3AED6;
+    --font-heading: 'Exo 2', sans-serif;
+    --font-body: 'Noto Sans SC', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
 body {
-    font-family: 'Montserrat', 'Noto Sans SC', sans-serif;
-    color: #E0E0E0;
-    background-color: #05050a; /* 更深的背景色 */
-    overflow: hidden; /* 防止滚动条出现 */
+    font-family: var(--font-body);
+    color: var(--text-primary);
+    background-color: var(--bg-dark-blue); /* 纯黑背景色 */
+    margin: 0;
+    overflow-x: hidden;
+    position: relative; 
 }
-.text-glow {
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.3), 0 0 20px rgba(122, 92, 255, 0.5);
+
+/* --- Canvas 背景样式 --- */
+#interactive-grid-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; /* 置于所有内容的最底层 */
+    pointer-events: none; /* 允许鼠标穿透 */
 }
-.button-glow:hover {
-    box-shadow: 0 0 15px rgba(255, 105, 180, 0.8); /* 匹配粉色主题 */
-    transform: scale(1.05);
+
+
+/* --- Layout & Structure --- */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem 1rem;
+    z-index: 50;
+    background-color: rgba(10, 15, 30, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+nav {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+section {
+    padding: 8rem 2rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+#home {
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: 6rem;
+    padding-top: 1rem;
+}
+.section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+/* --- Typography & Effects --- */
+.logo {
+    font-family: var(--font-heading);
+    font-size: 1.875rem;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+    text-shadow: 0 0 8px rgba(234, 234, 234, 0.2), 0 0 20px var(--accent-purple);
+}
+.gradient-text {
+    background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple), #a7d8de);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.hero-heading, .section-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-weight: 900;
+    color: white;
+    line-height: 1.2;
+    text-shadow: 0 0 8px rgba(234, 234, 234, 0.2), 0 0 20px var(--accent-purple);
+}
+.hero-subheading, .section-subheading {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin-top: -2rem;
+}
+
+/* --- Components --- */
+.nav-links {
+    display: flex;
+    gap: 2.5rem;
+    font-size: 1.125rem;
+}
+.nav-link {
+    color: var(--text-primary);
+    text-decoration: none;
     transition: all 0.3s ease;
 }
 .nav-link:hover {
-    color: #fff;
-    text-shadow: 0 0 10px rgba(255, 105, 180, 0.8); /* 匹配粉色主题 */
+    color: white;
+    text-shadow: 0 0 10px var(--accent-pink);
+}
+
+/* --- Call to Action Button (Consolidated) --- */
+.button-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--accent-pink);
+    color: var(--text-primary);
+    background: rgba(255, 183, 197, 0.1);
+    border-radius: 9999px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(.4,2,.6,1);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.button-cta:hover {
+    color: white;
+    background-color: rgba(255, 183, 197, 0.2);
+    box-shadow: 0 0 20px var(--accent-pink);
+    transform: translateY(-2px);
+}
+.button-cta-text {
+    transition: transform 0.3s ease;
+}
+.button-cta-arrow {
+    display: inline-block;
+    margin-left: 0.5em;
+    opacity: 0;
+    width: 0;
+    transform: translateX(-10px);
     transition: all 0.3s ease;
 }
-.gradient-text {
-    background: linear-gradient(90deg, #ffc0cb, #ff69b4, #db7093); /* 粉色系渐变 */
-    -webkit-background-clip: text;
-    background-clip: text; /* 标准写法，增强兼容性 */
-    -webkit-text-fill-color: transparent;
-    color: transparent; /* 标准写法，增强兼容性 */
+.button-cta:hover .button-cta-arrow {
+    opacity: 1;
+    width: 1.5em; 
+    transform: translateX(0);
 }
+.button-cta.large {
+    margin-top: 2.5rem;
+    padding: 1rem 2rem;
+    font-size: 1.25rem;
+}
+
+
+/* --- Particle Canvas --- */
 #particle-container {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 0;
+    z-index: 1;
     cursor: crosshair;
 }
-.button-cta {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+.hero-content {
     position: relative;
-    transition: all 0.3s cubic-bezier(.4,2,.6,1);
-    min-width: 0;
-    width: auto;
-    max-width: 100%;
-    box-sizing: border-box;
-    word-break: keep-all;
+    z-index: 2;
 }
-.button-cta-text {
-    display: inline-block;
-    text-align: center;
-    width: auto;
-    white-space: nowrap;
+
+/* --- Scrolling Gallery (Re-styled like karot.jiejoe.com) --- */
+.scroller-wrapper { width: 100%; display: flex; flex-direction: column; gap: 2rem; }
+@keyframes scroll-ltr { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes scroll-rtl { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+.scroller { 
+    width: 100%; 
+    overflow: hidden; 
+    -webkit-mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent); 
+    mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent); 
 }
-.button-cta-arrow {
-    display: inline-block;
-    margin-left: 0.2em;
+.scroller-inner { 
+    display: flex; 
+    flex-wrap: nowrap; 
+    width: max-content; 
+    animation-duration: 60s; 
+    animation-timing-function: linear; 
+    animation-iteration-count: infinite; 
+}
+.scroller-ltr .scroller-inner { animation-name: scroll-ltr; }
+.scroller-rtl .scroller-inner { animation-name: scroll-rtl; }
+.scroller:hover .scroller-inner { animation-play-state: paused; }
+
+.scroller-item {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    margin: 0 1rem;
+    flex-shrink: 0;
+    transition: all 0.4s ease;
+}
+.scroller-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+}
+.scroller-img {
+    height: 220px;
+    width: 380px;
+    object-fit: cover;
+    border-radius: 0.75rem;
+    transition: all 0.4s ease;
+}
+.scroller-item:hover .scroller-img {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 15px var(--accent-pink);
+}
+
+/* --- FAQ Section (Re-styled like karot.jiejoe.com) --- */
+.faq-container { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 2.5rem; }
+.faq-item {
     opacity: 0;
-    color: inherit;
-    width: 0;
+    transform: translateY(20px);
+    animation: a-fade-in 0.5s forwards;
+    position: relative;
+}
+.q-bubble-wrapper, .a-bubble-wrapper {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+}
+.q-bubble-wrapper {
+    justify-content: flex-end;
+    cursor: pointer;
+}
+.a-bubble-wrapper {
+    justify-content: flex-start;
+}
+
+.question-bubble {
+    background-color: #2E335A;
+    border: 1px solid #4D426D;
+    color: var(--text-primary);
+    border-radius: 20px 20px 5px 20px;
+    padding: 1.25rem 1.75rem;
+    max-width: 80%;
+    transition: background-color 0.3s ease;
+    position: relative;
+}
+.faq-item.active .question-bubble, .question-bubble:hover { 
+    background-color: #3a4072; 
+}
+.answer-bubble {
+    background: linear-gradient(to right, rgba(10, 15, 30, 0.8), rgba(10, 15, 30, 0.5));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-radius: 20px 5px 20px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    max-width: 85%;
+    color: var(--text-secondary);
+    
+    max-height: 0;
+    opacity: 0;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(.4,2,.6,1);
-    pointer-events: none;
-    white-space: nowrap;
+    transform: translateY(-10px);
+    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, transform 0.5s ease-in-out, padding 0.5s ease-in-out;
+    padding: 0 1.75rem; /* No padding when collapsed */
+    margin-top: 1rem;
 }
-.button-cta:hover .button-cta-arrow,
-.button-cta:focus .button-cta-arrow {
+.faq-item.active .answer-bubble {
+    max-height: 500px;
     opacity: 1;
-    width: 1.5em;
+    transform: translateY(0);
+    padding: 1.25rem 1.75rem; /* Add padding back when expanded */
 }
-@media (max-width: 480px) {
-  .button-cta {
-    font-size: 1rem;
-    padding-left: 0.75em;
-    padding-right: 0.75em;
-    min-width: 0;
-  }
-  .button-cta-arrow {
-    width: 0;
-    font-size: 1em;
-  }
-  .button-cta:hover .button-cta-arrow,
-  .button-cta:focus .button-cta-arrow {
-    width: 1.2em;
-  }
+
+.avatar-icon {
+    width: 48px; 
+    height: 48px; 
+    flex-shrink: 0; 
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background-size: cover;
+    background-position: center;
+}
+.avatar-icon.user {
+    background-color: var(--accent-pink);
+    background-image: url('https://img.icons8.com/ios-glyphs/90/ffffff/user-male-circle.png');
+}
+.avatar-icon.bot {
+    background-color: var(--accent-purple);
+    background-image: url('https://img.icons8.com/ios-filled/100/ffffff/sparkling-diamond.png');
+    background-size: 60%;
+    background-repeat: no-repeat;
+}
+
+@keyframes a-fade-in { to { opacity: 1; transform: translateY(0); } }
+.faq-item:nth-child(1) { animation-delay: 0.1s; }
+.faq-item:nth-child(2) { animation-delay: 0.3s; }
+.faq-item:nth-child(3) { animation-delay: 0.5s; }
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    #home { 
+        padding-left: 2rem; 
+        padding-top: 6rem;
+        justify-content: center; 
+        align-items: center; 
+        text-align: center; 
+    }
+    .hero-subheading { margin-left: auto; margin-right: auto; }
+    .nav-links { display: none; }
+    .scroller-img { height: 150px; width: 260px; }
+    .question-bubble, .answer-bubble { padding: 1rem 1.25rem; }
+    .avatar-icon { width: 40px; height: 40px; }
+}
+
+/* ================================================= */
+/* === 请用这段代码替换掉旧的 @media (max-width: 768px) 代码 === */
+/* ================================================= */
+@media (max-width: 768px) {
+    /* --- 导航栏修复 --- */
+    header {
+        /* 在手机上给导航栏更少的左右内边距 */
+        padding: 1rem 1.5rem; 
+    }
+    .logo {
+        /* 【关键】在手机上强制取消向左的偏移 */
+        position: static; /* 使用 static 来重置 position，比 relative 更彻底 */
+        /* 也可以适当减小字体大小 */
+        font-size: 1.6rem;
+    }
+    nav .button-cta {
+    position: relative;
+    right: 1.9rem; /* 只将导航栏内的按钮向左移动 */
+    }
+
+    /* --- 其他原有样式 --- */
+    #home { 
+        padding-left: 2rem; 
+        /* 将顶部间距从 6rem 大幅减小到 4rem，让文字上移 */
+        padding-top: 4rem; 
+        /* 将内容从垂直居中改为顶部对齐 */
+        justify-content: flex-start; 
+        align-items: center; 
+        text-align: center; 
+        overflow: visible;
+    }
+    .hero-subheading {
+        margin-left: auto;
+        margin-right: auto;
+        /* 为手机视图下的副标题增加上边距，让它和主标题拉开距离 */
+        margin-top: 2rem; 
+    }
+    .nav-links { display: none; }
+    .scroller-img { height: 150px; width: 260px; }
+    .question-bubble, .answer-bubble { padding: 1rem 1.25rem; }
+    .avatar-icon { width: 40px; height: 40px; }
 }
