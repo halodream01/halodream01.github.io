@@ -371,3 +371,92 @@ section {
 #companion .section-heading {
     text-shadow: 0 0 15px rgba(0,0,0,0.7), 0 0 20px var(--accent-purple);
 }
+
+/*
+=====================================
+=== 篝火页脚样式 (全新版本) ===
+=====================================
+*/
+.campfire-scene {
+    position: relative;
+    height: 600px; /* 您可以根据图片调整此高度 */
+    background-image: url('p01.png'); /* 初始的暗场景图 */
+    background-size: cover;
+    background-position: center bottom;
+    overflow: hidden;
+}
+
+/* 整个场景在黑暗状态下都可以点击 */
+.campfire-scene.dark {
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 10c-1.7 0-3.2.8-4.2 2-1 1.2-1.8 2.8-1.8 4.5 0 1.7.8 3.2 2 4.2s2.8 1.8 4.5 1.8 3.2-.8 4.2-2c1-1.2 1.8-2.8 1.8-4.5 0-1.7-.8-3.2-2-4.2s-2.8-1.8-4.5-1.8zM14.5 10V3M12 5h5"/></svg>') 16 0, auto;
+}
+
+/* 黑色蒙版 */
+.campfire-scene.dark::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    transition: opacity 2s ease-in-out;
+    z-index: 5;
+    opacity: 1;
+}
+
+/* 探照灯光圈效果 */
+.campfire-scene .spotlight {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(circle 200px at 50% 50%, transparent 10%, rgba(0,0,0,0.98) 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+}
+
+/* 鼠标悬停在黑暗场景时，显示探照灯 */
+.campfire-scene.dark:hover .spotlight {
+    opacity: 1;
+}
+
+/* 点亮后的GIF场景图层 */
+.campfire-lit-scene {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 确保GIF填满整个容器 */
+    object-position: center bottom;
+    opacity: 0; /* 初始时完全透明 */
+    transition: opacity 2s ease-in-out;
+    z-index: 20; /* 确保它在最上层 */
+    pointer-events: none; /* 点亮后不再响应点击 */
+}
+
+
+/* --- 点亮后的状态 --- */
+/* 隐藏黑暗蒙版 */
+.campfire-scene.lit-up::before {
+    opacity: 0;
+}
+
+/* 强制隐藏探照灯 */
+.campfire-scene.lit-up .spotlight {
+    opacity: 0 !important;
+}
+
+/* 显示点亮后的GIF场景 */
+.campfire-scene.lit-up .campfire-lit-scene {
+    opacity: 1;
+}
+
+/* 恢复默认鼠标指针 */
+.campfire-scene.lit-up {
+    cursor: default;
+}
