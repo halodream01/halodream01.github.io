@@ -141,11 +141,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * ------------------------------------------------------------------------
-     * PART 2: FAQ Chat Functionality [UPDATED]
+     * PART 2: FAQ Chat Functionality (No Change)
      * ------------------------------------------------------------------------
      */
     (() => {
-        // Select all the chat "turns", each containing a question and an answer.
         const chatTurns = document.querySelectorAll('.chat-turn');
         if (!chatTurns.length) return;
 
@@ -153,16 +152,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const questionBubble = turn.querySelector('.chat-bubble.question');
             
             if (questionBubble) {
-                // Add a click listener to the question bubble.
                 questionBubble.addEventListener('click', () => {
-                    // When clicked, toggle the 'active' class on the parent .chat-turn container.
-                    // The CSS will handle showing/hiding the answer bubble based on this class.
                     turn.classList.toggle('active');
                 });
             }
         });
     })();
-    
     
     /**
      * ------------------------------------------------------------------------
@@ -282,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * ------------------------------------------------------------------------
-     * PART 4: Companion Section Sprite Animation (No Change)
+     * PART 4: Companion Section Planet Animation (No Change)
      * ------------------------------------------------------------------------
      */
     (() => {
@@ -291,11 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const canvas = document.getElementById('companion-canvas');
         const ctx = canvas.getContext('2d');
-        const contentContainer = companionSection.querySelector('.companion-content');
-        const title = contentContainer.querySelector('.section-heading');
-        const subtitle = contentContainer.querySelector('.section-subheading');
-        const ctaButton = contentContainer.querySelector('.button-cta');
-
+        
         let width, height, centerX, centerY;
         
         function resizeCanvas() {
@@ -303,128 +294,111 @@ document.addEventListener('DOMContentLoaded', () => {
             height = canvas.height = companionSection.offsetHeight;
             centerX = width / 2;
             centerY = height / 2;
-            initSprites(); 
+            initPlanets(); 
         }
 
         window.addEventListener('resize', resizeCanvas);
 
-        const mouse = { x: 0, y: 0 };
+        class Planet {
+            constructor(orbitRadius, baseColor, revolutionSpeed, rotationSpeed, size) {
+                this.orbitRadius = orbitRadius;
+                this.baseColor = baseColor;
+                this.revolutionSpeed = revolutionSpeed;
+                this.rotationSpeed = rotationSpeed;
+                this.size = size;
+                this.orbitAngle = Math.random() * Math.PI * 2;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.hasRing = Math.random() > 0.8; // 20% chance of having a ring
 
-        window.addEventListener('mousemove', (event) => {
-            const rect = companionSection.getBoundingClientRect();
-            mouse.x = event.clientX - rect.left;
-            mouse.y = event.clientY - rect.top;
+                this.surfaceColors = [
+                    this.baseColor,
+                    this.getColorVariation(this.baseColor, 15),
+                    this.getColorVariation(this.baseColor, -20)
+                ];
+                this.ringColor = this.getColorVariation(this.baseColor, 30);
+            }
 
-            const offsetX = (mouse.x - centerX) / centerX;
-            const offsetY = (mouse.y - centerY) / centerY;
-            
-            const titleStrength = 15;
-            const subtitleStrength = 10;
-            const buttonStrength = 5;
+            getColorVariation(hex, amount) {
+                hex = hex.replace('#', '');
+                let r = parseInt(hex.substring(0, 2), 16);
+                let g = parseInt(hex.substring(2, 4), 16);
+                let b = parseInt(hex.substring(4, 6), 16);
 
-            title.style.transform = `translate(${offsetX * titleStrength}px, ${offsetY * titleStrength}px)`;
-            subtitle.style.transform = `translate(${offsetX * subtitleStrength}px, ${offsetY * subtitleStrength}px)`;
-            
-            const baseTransform = `translate(${offsetX * buttonStrength}px, ${offsetY * buttonStrength}px)`;
-            ctaButton.style.transform = baseTransform;
-            
-            ctaButton.onmouseenter = () => ctaButton.style.transform = `${baseTransform} translateY(-2px)`;
-            ctaButton.onmouseleave = () => ctaButton.style.transform = baseTransform;
-        });
+                r = Math.max(0, Math.min(255, r + amount));
+                g = Math.max(0, Math.min(255, g + amount));
+                b = Math.max(0, Math.min(255, b + amount));
 
-        class Sprite {
-            constructor(x, y, radius, color) {
-                this.x = x;
-                this.y = y;
-                this.baseX = x;
-                this.baseY = y;
-                this.radius = radius;
-                this.color = color;
-                this.angle = Math.atan2(centerY - this.y, centerX - this.x);
-                this.targetAngle = this.angle;
-                this.glow = 15;
+                return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
             }
 
             update() {
-                const dxMouse = mouse.x - this.x;
-                const dyMouse = mouse.y - this.y;
-                this.targetAngle = Math.atan2(dyMouse, dxMouse);
-
-                let angleDifference = this.targetAngle - this.angle;
-                while (angleDifference < -Math.PI) angleDifference += 2 * Math.PI;
-                while (angleDifference > Math.PI) angleDifference -= 2 * Math.PI;
-                this.angle += angleDifference * 0.08;
-
-                const distMouseToCenter = Math.hypot(mouse.x - centerX, mouse.y - centerY);
-                const attractionForce = 1 - Math.min(distMouseToCenter / (width/3.5), 1); 
-                
-                const dxBase = this.baseX - this.x;
-                const dyBase = this.baseY - this.y;
-                const dxCenter = centerX - this.x;
-                const dyCenter = centerY - this.y;
-
-                this.x += dxBase * 0.05 + dxCenter * 0.02 * attractionForce;
-                this.y += dyBase * 0.05 + dyCenter * 0.02 * attractionForce;
-
-                const distToMouse = Math.hypot(this.x - mouse.x, this.y - mouse.y);
-                if (distToMouse < 80) {
-                    this.glow = 45;
-                } else {
-                    this.glow -= (this.glow - 15) * 0.05; 
-                }
+                this.orbitAngle += this.revolutionSpeed;
+                this.x = centerX + Math.cos(this.orbitAngle) * this.orbitRadius;
+                this.y = centerY + Math.sin(this.orbitAngle) * this.orbitRadius;
+                this.rotation += this.rotationSpeed;
             }
 
             draw() {
                 ctx.save();
                 ctx.translate(this.x, this.y);
-                ctx.rotate(this.angle);
-                ctx.shadowColor = this.color;
-                ctx.shadowBlur = this.glow;
+                
+                if (this.hasRing) {
+                    ctx.save();
+                    ctx.rotate(this.rotation * 0.5);
+                    ctx.beginPath();
+                    ctx.lineWidth = this.size * 0.1;
+                    ctx.strokeStyle = `rgba(${parseInt(this.ringColor.slice(1,3), 16)}, ${parseInt(this.ringColor.slice(3,5), 16)}, ${parseInt(this.ringColor.slice(5,7), 16)}, 0.4)`;
+                    ctx.scale(1, 0.35);
+                    ctx.arc(0, 0, this.size * 1.7, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                ctx.rotate(this.rotation);
+
+                const gradient = ctx.createRadialGradient(-this.size / 3, -this.size / 3, 0, 0, 0, this.size);
+                gradient.addColorStop(0, this.surfaceColors[1]);
+                gradient.addColorStop(0.7, this.surfaceColors[0]);
+                gradient.addColorStop(1, this.surfaceColors[2]);
+                
                 ctx.beginPath();
-                ctx.moveTo(this.radius * 0.8, 0);
-                ctx.lineTo(-this.radius * 0.7, -this.radius * 0.6);
-                ctx.lineTo(-this.radius * 0.7, this.radius * 0.6);
-                ctx.closePath();
-                ctx.fillStyle = this.color;
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.shadowColor = this.baseColor;
+                ctx.shadowBlur = 10;
                 ctx.fill();
-                ctx.beginPath();
-                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(0, 0, this.radius * 0.6, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                ctx.fill();
+                
                 ctx.restore();
             }
         }
 
-        let sprites = [];
-        // [MODIFIED] Colors changed to a warm palette
-        const colors = ['#FFC300', '#FF5733', '#C70039', '#F9D423', '#F8A51B', '#E87A00', '#FF8D1A'];
+        let planets = [];
+        const colors = ['#FFC300', '#FF5733', '#C70039', '#900C3F', '#581845', '#4A90E2', '#50E3C2', '#B8E986'];
 
-        function initSprites() {
-            sprites = [];
-            const numberOfSprites = 15;
-            const circleRadius = Math.min(width, height) * 0.30;
+        function initPlanets() {
+            planets = [];
+            const numberOfPlanets = 8;
+            const baseOrbit = Math.min(width, height) * 0.25;
+            const orbitGap = Math.min(width, height) * 0.04;
 
-            for (let i = 0; i < numberOfSprites; i++) {
-                const angle = (i / numberOfSprites) * Math.PI * 2;
-                const x = centerX + Math.cos(angle) * circleRadius;
-                const y = centerY + Math.sin(angle) * circleRadius;
-                const spriteRadius = 8 + Math.random() * 6;
+            for (let i = 0; i < numberOfPlanets; i++) {
+                const orbitRadius = baseOrbit + i * orbitGap;
                 const color = colors[i % colors.length];
-                sprites.push(new Sprite(x, y, spriteRadius, color));
+                const revolutionSpeed = (0.0005 + i * 0.0001) * (i % 2 === 0 ? 1 : -1);
+                const rotationSpeed = (Math.random() - 0.5) * 0.02;
+                const size = 6 + Math.random() * 8;
+                
+                planets.push(new Planet(orbitRadius, color, revolutionSpeed, rotationSpeed, size));
             }
         }
 
         function animate() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
             ctx.fillRect(0, 0, width, height);
 
-            sprites.forEach(sprite => {
-                sprite.update();
-                sprite.draw();
+            planets.forEach(planet => {
+                planet.update();
+                planet.draw();
             });
 
             requestAnimationFrame(animate);
@@ -433,4 +407,44 @@ document.addEventListener('DOMContentLoaded', () => {
         resizeCanvas();
         animate();
     })();
+
+    /**
+     * ======================================================================
+     * === PART 5: 篝火页脚互动脚本 (全新版本) ===
+     * ======================================================================
+     */
+    (() => {
+        const campfireScene = document.querySelector('.campfire-scene');
+        if (!campfireScene) return;
+
+        const spotlight = campfireScene.querySelector('.spotlight');
+
+        if (!spotlight) {
+            console.error('探照灯元素 (.spotlight) 未找到。');
+            return;
+        }
+
+        // 1. 探照灯跟随鼠标移动
+        campfireScene.addEventListener('mousemove', (e) => {
+            if (campfireScene.classList.contains('dark')) {
+                const rect = campfireScene.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                window.requestAnimationFrame(() => {
+                    spotlight.style.background = `radial-gradient(circle 200px at ${x}px ${y}px, transparent 10%, rgba(0,0,0,0.98) 70%)`;
+                });
+            }
+        });
+
+        // 2. 点击整个场景来点亮
+        campfireScene.addEventListener('click', () => {
+            if (campfireScene.classList.contains('dark')) {
+                campfireScene.classList.remove('dark');
+                campfireScene.classList.add('lit-up');
+            }
+        }, { once: true }); // 事件只触发一次
+
+    })();
+
 });
