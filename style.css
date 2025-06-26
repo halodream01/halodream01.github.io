@@ -7,13 +7,17 @@
     --accent-purple: #C3AED6;
     --font-heading: 'Exo 2', sans-serif;
     --font-body: 'Noto Sans SC', sans-serif;
+    /* [MODIFIED] New chat variables */
+    --chat-answer-bg: #2a2f4d;
+    --chat-question-bg: #4a436a;
+    --chat-border: rgba(195, 174, 214, 0.2);
 }
 
 html { scroll-behavior: smooth; }
 body {
     font-family: var(--font-body);
     color: var(--text-primary);
-    background-color: var(--bg-dark-blue); /* 纯黑背景色 */
+    background-color: var(--bg-dark-blue);
     margin: 0;
     overflow-x: hidden;
     position: relative; 
@@ -26,8 +30,8 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 0; /* 置于所有内容的最底层 */
-    pointer-events: none; /* 允许鼠标穿透 */
+    z-index: 0;
+    pointer-events: none;
 }
 
 
@@ -73,6 +77,16 @@ section {
     margin-bottom: 4rem;
 }
 
+/* --- Animation Keyframes --- */
+@keyframes breathing-glow {
+    0%, 100% {
+        text-shadow: 0 0 8px rgba(234, 234, 234, 0.2), 0 0 20px var(--accent-purple);
+    }
+    50% {
+        text-shadow: 0 0 12px rgba(234, 234, 234, 0.3), 0 0 30px var(--accent-purple);
+    }
+}
+
 /* --- Typography & Effects --- */
 .logo {
     font-family: var(--font-heading);
@@ -87,6 +101,7 @@ section {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    animation: breathing-glow 4s ease-in-out infinite;
 }
 .hero-heading, .section-heading {
     font-family: var(--font-heading);
@@ -164,7 +179,6 @@ section {
     font-size: 1.25rem;
 }
 
-
 /* --- Particle Canvas --- */
 #particle-container {
     position: absolute;
@@ -227,145 +241,133 @@ section {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 15px var(--accent-pink);
 }
 
-/* --- FAQ Section (Re-styled like karot.jiejoe.com) --- */
-.faq-container { width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 2.5rem; }
-.faq-item {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: a-fade-in 0.5s forwards;
-    position: relative;
-}
-.q-bubble-wrapper, .a-bubble-wrapper {
+
+/* --- [UPDATED] FAQ Section Styles --- */
+.chat-container {
+    width: 100%;
+    max-width: 800px;
     display: flex;
-    align-items: flex-end;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 2rem;
 }
-.q-bubble-wrapper {
-    justify-content: flex-end;
-    cursor: pointer;
+.chat-turn {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 }
-.a-bubble-wrapper {
-    justify-content: flex-start;
-}
-
-.question-bubble {
-    background-color: #2E335A;
-    border: 1px solid #4D426D;
-    color: var(--text-primary);
-    border-radius: 20px 20px 5px 20px;
-    padding: 1.25rem 1.75rem;
+.chat-bubble {
     max-width: 80%;
-    transition: background-color 0.3s ease;
+    padding: 1rem 1.5rem;
+    border-radius: 20px;
+    border: 1px solid var(--chat-border);
     position: relative;
 }
-.faq-item.active .question-bubble, .question-bubble:hover { 
-    background-color: #3a4072; 
+.chat-bubble p, .chat-bubble h3 {
+    margin: 0;
 }
-.answer-bubble {
-    background: linear-gradient(to right, rgba(10, 15, 30, 0.8), rgba(10, 15, 30, 0.5));
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border-radius: 20px 5px 20px 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    max-width: 85%;
-    color: var(--text-secondary);
-    
-    max-height: 0;
+/* Question bubble (User, on the right) */
+.chat-bubble.question {
+    background-color: var(--chat-question-bg);
+    align-self: flex-end;
+    border-bottom-right-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.chat-bubble.question:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 20px rgba(74, 67, 106, 0.5);
+}
+.chat-bubble.question h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+/* Answer bubble (Bot, on the left) */
+.chat-bubble.answer {
+    background-color: var(--chat-answer-bg);
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+    /* --- Hidden by default --- */
     opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-width: 0;
+    margin-top: 0;
     overflow: hidden;
-    transform: translateY(-10px);
-    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, transform 0.5s ease-in-out, padding 0.5s ease-in-out;
-    padding: 0 1.75rem; /* No padding when collapsed */
-    margin-top: 1rem;
+    transform: translateX(-20px);
+    transition: all 0.5s ease-in-out;
 }
-.faq-item.active .answer-bubble {
-    max-height: 500px;
+.chat-bubble.answer p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+/* --- Active state to show the answer --- */
+.chat-turn.active .chat-bubble.answer {
     opacity: 1;
-    transform: translateY(0);
-    padding: 1.25rem 1.75rem; /* Add padding back when expanded */
+    max-height: 500px; /* Large enough to not clip content */
+    padding: 1rem 1.5rem;
+    border-width: 1px;
+    transform: translateX(0);
+    margin-top: 0.75rem; /* [FIX] Add margin-top only when visible to create space */
 }
 
-.avatar-icon {
-    width: 48px; 
-    height: 48px; 
-    flex-shrink: 0; 
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    background-size: cover;
-    background-position: center;
-}
-.avatar-icon.user {
-    background-color: var(--accent-pink);
-    background-image: url('https://img.icons8.com/ios-glyphs/90/ffffff/user-male-circle.png');
-}
-.avatar-icon.bot {
-    background-color: var(--accent-purple);
-    background-image: url('https://img.icons8.com/ios-filled/100/ffffff/sparkling-diamond.png');
-    background-size: 60%;
-    background-repeat: no-repeat;
-}
 
-@keyframes a-fade-in { to { opacity: 1; transform: translateY(0); } }
-.faq-item:nth-child(1) { animation-delay: 0.1s; }
-.faq-item:nth-child(2) { animation-delay: 0.3s; }
-.faq-item:nth-child(3) { animation-delay: 0.5s; }
-
-/* Responsive Adjustments */
+/* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
+    header { padding: 1rem 1.5rem; }
+    .logo { position: static; font-size: 1.6rem; }
+    nav .button-cta { position: relative; right: 1.9rem; }
     #home { 
         padding-left: 2rem; 
-        padding-top: 6rem;
-        justify-content: center; 
-        align-items: center; 
-        text-align: center; 
-    }
-    .hero-subheading { margin-left: auto; margin-right: auto; }
-    .nav-links { display: none; }
-    .scroller-img { height: 150px; width: 260px; }
-    .question-bubble, .answer-bubble { padding: 1rem 1.25rem; }
-    .avatar-icon { width: 40px; height: 40px; }
-}
-
-/* ================================================= */
-/* === 请用这段代码替换掉旧的 @media (max-width: 768px) 代码 === */
-/* ================================================= */
-@media (max-width: 768px) {
-    /* --- 导航栏修复 --- */
-    header {
-        /* 在手机上给导航栏更少的左右内边距 */
-        padding: 1rem 1.5rem; 
-    }
-    .logo {
-        /* 【关键】在手机上强制取消向左的偏移 */
-        position: static; /* 使用 static 来重置 position，比 relative 更彻底 */
-        /* 也可以适当减小字体大小 */
-        font-size: 1.6rem;
-    }
-    nav .button-cta {
-    position: relative;
-    right: 1.9rem; /* 只将导航栏内的按钮向左移动 */
-    }
-
-    /* --- 其他原有样式 --- */
-    #home { 
-        padding-left: 2rem; 
-        /* 将顶部间距从 6rem 大幅减小到 4rem，让文字上移 */
         padding-top: 4rem; 
-        /* 将内容从垂直居中改为顶部对齐 */
         justify-content: flex-start; 
         align-items: center; 
         text-align: center; 
         overflow: visible;
     }
-    .hero-subheading {
-        margin-left: auto;
-        margin-right: auto;
-        /* 为手机视图下的副标题增加上边距，让它和主标题拉开距离 */
-        margin-top: 2rem; 
-    }
+    .hero-subheading { margin-left: auto; margin-right: auto; margin-top: 2rem; }
     .nav-links { display: none; }
     .scroller-img { height: 150px; width: 260px; }
-    .question-bubble, .answer-bubble { padding: 1rem 1.25rem; }
-    .avatar-icon { width: 40px; height: 40px; }
+    
+    /* [MODIFIED] Chat Responsive */
+    .chat-bubble { max-width: 90%; }
+    .chat-bubble.question h3 { font-size: 1.1rem; }
+    .chat-bubble.answer p { font-size: 1rem; }
 }
+
+/* --- Companion Section --- */
+#companion {
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+    background-color: var(--bg-dark-blue);
+}
+#companion-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+.companion-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#companion .section-subheading {
+    margin-top: 1rem;
+    margin-bottom: 1.5rem; /* 上移按钮 */
+    text-shadow: 0 0 15px rgba(0,0,0,0.7);
+}
+#companion .section-heading {
+    text-shadow: 0 0 15px rgba(0,0,0,0.7), 0 0 20px var(--accent-purple);
+}s
